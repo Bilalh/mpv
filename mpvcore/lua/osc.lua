@@ -20,6 +20,7 @@ local user_opts = {
     fadeduration = 200,                     -- duration of fade out in ms, 0 = no fade
     deadzonedist = 0.15,                    -- distance between OSC and deadzone
     iAmAProgrammer = false,                 -- use native mpv counting and disable OSC internal playlist management (and some functions that depend on it)
+	oscDuration = 2,                       -- duration in s for osc
 }
 
 local osc_param = {
@@ -991,6 +992,9 @@ function show_osc()
         state.anitype = nil
     end
 
+	if (state.duration == nil) then
+		state.duration = mp.get_timer()
+	end
 end
 
 function hide_osc()
@@ -1025,6 +1029,13 @@ function render()
         osc_init()
         state.initREQ = false
     end
+
+	if not(state.duration == nil) then
+	    if ( mp.get_timer() - state.duration > user_opts.oscDuration  ) then
+			state.duration = nil
+			state.anitype = "out"
+		end
+	end
 
     if not(state.anitype == nil) then
 
